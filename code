@@ -1,0 +1,184 @@
+#hanadi abdulrahem alsulami - kau - jed - KSA
+import numpy as np
+import numpy as np
+from sklearn.metrics import r2_score
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+#sigmoid function
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+#defining training set
+
+training_inputs = np.array([[300,99,6.8],
+                                [308,103,8.36],
+                                [329,110,9.15],
+                                [332,118,9.36]])
+
+training_outputs = np.array([[0.36,0.7,0.84,0.9]]).T
+
+#scaling the training set both manualy and using stander scaler library
+
+#training_inputs[0:4,0] =training_inputs[0:4,0] / 332
+#training_inputs[0:4,1] = training_inputs[0:4,1]/118
+#training_inputs[0:4,2] = training_inputs[0:4,2] / 9.36
+
+scaler = StandardScaler()
+x_scaler = scaler.fit_transform(training_inputs)
+training_inputs = PCA (n_components = 3).fit_transform(x_scaler)
+
+
+
+#initalize the weights with random values manualy 
+
+w1= 0.2
+w2 = 0.2
+w3 = 0.4
+w4= 0.5
+w5= 0.4
+w6 =0.3
+w7 =0.6
+w8= 0.4
+w9= 0.2
+w10 = 0.3
+w11 = 0.3
+w12 =0.2
+
+b1 = 0.2
+b2=0.2
+
+epoch = 4
+alpha = 0.01
+
+
+for i in range (epoch):
+    featuers = training_inputs[i]
+    #forword propgate
+    print('######################################################\n')
+    print('epoch',i+1,'featuers :',featuers)
+
+    t1 = featuers[0] * w1 + featuers[1] * w2 + featuers[2]*w3 +b1
+    h1 = sigmoid(t1)
+
+    print('H1 = ',h1)
+
+    t2 = featuers[0] * w4 + featuers[1] * w5 + featuers[2]*w6 +b1
+    h2 = sigmoid(t2)
+
+    print('H2 = ',h2)
+
+    t3 = featuers[0] * w7 + featuers[1] * w8 + featuers[2]*w9 +b1
+    h3 = sigmoid(t3)
+
+    print('H3 = ',h3)
+    
+
+    y_pred = (h1 * w10) + (h2 * w11)+(h3 * w12) + b2
+
+    print ('predicate output = ', y_pred)
+
+    print('loss: ',((y_pred - training_outputs[i])**2))
+    #backword propgate
+
+    update_w10 = ((y_pred - training_outputs[i])**2) * (y_pred *(1-y_pred)) * h1
+    update_w11 = ((y_pred - training_outputs[i])**2) * (y_pred *(1-y_pred)) * h2
+    update_w12 = ((y_pred - training_outputs[i])**2) * (y_pred *(1-y_pred)) * h3
+
+     
+    w10 = w10 - (alpha*update_w10)
+    w11 = w11 - (alpha*update_w11)
+    w12 = w12 - (alpha*update_w12)
+    
+
+    update_h1 = -((y_pred - training_outputs[i])**2)* (h1 *(1-h1)) * w10
+
+    update_t1_x1 = (update_h1 *(1-update_h1)) * featuers[0]
+    update_t1_x2= (update_h1 *(1-update_h1)) * featuers[1]
+    update_t1_x3= (update_h1 *(1-update_h1)) * featuers[2]
+
+
+    update_h2 = -((y_pred - training_outputs[i])**2)* (h2 *(1-h2)) * w11
+    
+    update_t2_x1 = (update_h2 *(1-update_h2)) * featuers[0]
+    update_t2_x2= (update_h2 *(1-update_h2)) * featuers[1]
+    update_t2_x3= (update_h2 *(1-update_h2)) * featuers[2]
+
+    
+    update_h3 = -((y_pred - training_outputs[i])**2)* (h3 *(1-h3)) * w12
+    
+    update_t3_x1 = (update_h3 *(1-update_h3)) * featuers[0]
+    update_t3_x2= (update_h3 *(1-update_h3)) * featuers[1]
+    update_t3_x3= (update_h3 *(1-update_h3)) * featuers[2]
+
+
+    
+    w1 = w1 - (alpha*update_t1_x1)
+    w2 = w2 - (alpha*update_t1_x2)
+    w3 = w3 - (alpha*update_t1_x3)
+    
+    w4 = w4 - (alpha*update_t2_x1)
+    w5 = w5 - (alpha*update_t2_x2)
+    w6 = w6 - (alpha*update_t2_x3)
+    
+    w7 = w7 - (alpha*update_t3_x1)
+    w8 = w8 - (alpha*update_t3_x2)
+    w9 = w9 - (alpha*update_t3_x3)
+    
+    
+    print('---------------------------\n')
+    print ('updated weights are \n ',w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,w11,w12,'\n')
+
+
+
+print('testing data ----------------------------------------------\n')   
+test_input = np.array([[296,95,7.54],
+                                [293,97,7.8],
+                                [325,112,8.96]])
+
+#scaling test set
+
+#test_input[0:3,0] =test_input[0:3,0] / 325
+#test_input[0:3,1] = test_input[0:3,1]/112
+#test_input[0:3,2] = test_input[0:3,2] / 8.96
+
+scaler = StandardScaler()
+x_scaler = scaler.fit_transform(test_input)
+test_input = PCA (n_components = 3).fit_transform(x_scaler)
+
+test_output = np.array([[0.44,0.64,0.8]]).T
+
+y_hat =np.array([0,0,0])
+
+for i in range(3):
+    
+
+    feat = test_input[i]
+    print('testing featuers are :',test_input[i])
+
+    t1 = feat[0] * w1 + feat[1] * w2 + feat[2]* w3 + b1
+    h1 = sigmoid(t1)
+
+    print('H1 = ',h1)
+
+    t2 = feat[0] * w4 + feat[1] * w5 + feat[2]*w6 + b1
+    h2 = sigmoid(t2)
+
+    print('H2 = ',h2)
+
+    t3 = feat[0] * w7 + feat[1] * w8 + feat[2]*w9 +b1
+    h3 = sigmoid(t3)
+
+    print('H3 = ',h3)
+
+    y_pred = (h1 * w10) + (h2 * w11) +(h3*w12)+ b2
+
+    y_hat[i] = y_pred
+
+    print ('predicate output = ', y_pred)
+
+
+mse = np.mean(np.sum((y_hat- test_output)**2))
+print("Prediction mean square error: {:.3f}".format(mse))
+
